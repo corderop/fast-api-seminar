@@ -1,4 +1,4 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, HTTPException, status
 
 app = FastAPI(
     title="Benefit Management System API",
@@ -10,5 +10,16 @@ departments = [
 ]
 
 @app.get("/departments", status_code=status.HTTP_200_OK)
-def get_departments() -> dict:
+def get_departments() -> list[dict]:
     return departments
+
+@app.get("/departments/{department_id}", status_code=status.HTTP_200_OK)
+def get_department(department_id: int) -> dict:
+    for department in departments:
+        if department["id"] == department_id:
+            return department
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Department not found",
+    )

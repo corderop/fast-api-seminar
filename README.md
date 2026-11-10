@@ -35,9 +35,10 @@ Then open:
 
 ## Endpoints
 
-| Method | Path            | Description          |
-| ------ | --------------- | -------------------- |
-| GET    | `/departments`  | Department benefits  |
+| Method | Path                  | Description          |
+| ------ | --------------------- | -------------------- |
+| GET    | `/departments`        | Department benefits  |
+| GET    | `/departments/{id}`   | Single department    |
 
 
 ## Try it
