@@ -58,9 +58,22 @@ curl -X POST http://127.0.0.1:8000/departments \
 
 ```
 app/
-  main.py             # FastAPI app and routes
-  cli.py              # dev entry point (uv run dev)
-  utils.py            # Shared helpers (getNextId)
-  schemas.py          # Pydantic models
-  routers/benefits.py # Benefits CRUD router (not mounted yet)
+  main.py                          # FastAPI app, mounts module routers
+  cli.py                           # dev entry point (uv run dev)
+  departments/                     # departments module
+    utils.py                       # Module helpers (getNextId)
+    controllers/departments.py     # HTTP routes, status codes, HTTP errors
+    use_cases/                     # One file per use case
+      get_departments.py           # List departments
+      get_department.py            # Fetch one department
+      create_department.py         # Create a department
+    repositories/departments.py    # In-memory storage and id generation
 ```
+
+Each module is a package under `app/` split into three layers:
+
+- `controllers` — FastAPI routers and request/response handling.
+- `use_cases` — business rules, independent of HTTP.
+- `repositories` — data access and persistence.
+
+Requests flow `controller → use case → repository`; controllers never touch storage directly.
