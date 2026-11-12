@@ -39,6 +39,7 @@ Then open:
 | ------ | --------------------- | -------------------- |
 | GET    | `/departments`        | Department benefits  |
 | GET    | `/departments/{id}`   | Single department    |
+| POST   | `/departments`        | Create a department  |
 
 
 ## Try it
@@ -47,12 +48,19 @@ Then open:
 curl http://127.0.0.1:8000/departments
 ```
 
+```bash
+curl -X POST http://127.0.0.1:8000/departments \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Tecnología", "benefits": ["Comida", "Transporte"]}'
+```
+
 ## Layout
 
 ```
 app/
   main.py             # FastAPI app and routes
   cli.py              # dev entry point (uv run dev)
+  utils.py            # Shared helpers (getNextId)
   schemas.py          # Pydantic models
   routers/benefits.py # Benefits CRUD router (not mounted yet)
 ```
