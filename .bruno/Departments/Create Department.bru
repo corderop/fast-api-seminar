@@ -1,0 +1,36 @@
+meta {
+  name: Create Department
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/departments
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name": "Ventas",
+    "benefits": ["Guardería", "Transporte", "Salud", "Pensión", "Aparcamiento"]
+  }
+}
+
+tests {
+  test("returns 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+  
+  test("returns the created department", function () {
+    var department = res.getBody();
+    expect(department.id).to.be.a("number");
+    expect(department.name).to.equal("Tecnología");
+    expect(department.benefits).to.deep.equal(["Comida", "Transporte"]);
+  });
+}
+
+docs {
+  Creates a department. `POST /departments`
+  A department accepts a maximum of 5 benefits.
+}

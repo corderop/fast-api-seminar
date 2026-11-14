@@ -60,6 +60,26 @@ curl -X POST http://127.0.0.1:8000/departments \
   -d '{"name": "Tecnología", "benefits": ["Comida", "Transporte"]}'
 ```
 
+## API client (Bruno)
+
+The [`.bruno/`](.bruno) folder is a [Bruno](https://www.usebruno.com/) collection
+covering every endpoint above, including the 404 branch.
+
+1. Start the API with `uv run dev`.
+2. In Bruno, choose **Collection → Open Collection** and select the `.bruno/` folder.
+   The folder is hidden by default, so press <kbd>⌘</kbd>+<kbd>⇧</kbd>+<kbd>.</kbd>
+   in the picker, or press <kbd>⌘</kbd>+<kbd>⇧</kbd>+<kbd>G</kbd> and paste the path.
+3. Select the **Local** environment (`baseUrl` = `http://127.0.0.1:8000`).
+
+Requests include tests, so the collection can also run headlessly:
+
+```bash
+cd .bruno
+npx @usebruno/cli run --env Local
+```
+
+The CLI must run from the collection root, so `cd` first.
+
 ## Layout
 
 ```
