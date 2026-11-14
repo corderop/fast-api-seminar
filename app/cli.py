@@ -3,6 +3,25 @@ import argparse
 import uvicorn
 
 
+def _run_pytest(default_path: str) -> None:
+    import sys
+
+    import pytest
+
+    targets = sys.argv[1:] or [default_path]
+    raise SystemExit(pytest.main(["-v", *targets]))
+
+
+def test_unit() -> None:
+    """Run the unit test suite, optionally scoped to specific paths or pytest options."""
+    _run_pytest("tests/unit")
+
+
+def test_acceptance() -> None:
+    """Run the acceptance test suite, optionally scoped to specific paths or pytest options."""
+    _run_pytest("tests/acceptance")
+
+
 def dev() -> None:
     """Run the API locally with auto-reload."""
     parser = argparse.ArgumentParser(

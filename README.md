@@ -33,6 +33,32 @@ Then open:
 - http://127.0.0.1:8000/docs — Swagger UI
 - http://127.0.0.1:8000/redoc — ReDoc
 
+## Test
+
+Run the unit test suite:
+
+```bash
+uv run test-unit
+```
+
+Run the acceptance test suite:
+
+```bash
+uv run test-acceptance
+```
+
+Both tasks are project scripts defined in `pyproject.toml` (`app.cli:test_unit`
+and `app.cli:test_acceptance`) that run pytest. Pass a path to run a single
+module, or any other pytest option:
+
+```bash
+uv run test-unit tests/unit/test_create_department.py
+uv run test-unit -k create_department
+```
+
+Unit tests live in `tests/unit/`; acceptance tests live in `tests/acceptance/`
+and exercise the API through `TestClient`.
+
 ## Endpoints
 
 | Method | Path                  | Description                            |
