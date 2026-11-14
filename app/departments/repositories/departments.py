@@ -5,9 +5,19 @@ _departments: list[dict] = [
 ]
 
 
-def list_departments() -> list[dict]:
-    """Return every department."""
-    return _departments
+def list_departments(benefit: str | None = None) -> list[dict]:
+    """Return every department, optionally filtered by one of their benefits."""
+    if benefit is None or not benefit.strip():
+        return _departments
+
+    requested_benefit = benefit.strip().casefold()
+
+    return [
+        department
+        for department in _departments
+        if requested_benefit
+        in (item.strip().casefold() for item in department["benefits"])
+    ]
 
 
 def find_department(department_id: int) -> dict | None:

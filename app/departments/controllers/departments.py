@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Query, status
 
 from app.departments.use_cases.create_department import (
     create_department as create_department_use_case,
@@ -14,8 +14,8 @@ router = APIRouter(prefix="/departments")
 
 
 @router.get("", status_code=status.HTTP_200_OK)
-def get_departments() -> list[dict]:
-    return get_departments_use_case()
+def get_departments(benefit: str | None) -> list[dict]:
+    return get_departments_use_case(benefit=benefit)
 
 
 @router.get("/{department_id}", status_code=status.HTTP_200_OK)

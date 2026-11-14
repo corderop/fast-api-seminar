@@ -35,12 +35,18 @@ Then open:
 
 ## Endpoints
 
-| Method | Path                  | Description          |
-| ------ | --------------------- | -------------------- |
-| GET    | `/departments`        | Department benefits  |
-| GET    | `/departments/{id}`   | Single department    |
-| POST   | `/departments`        | Create a department  |
+| Method | Path                  | Description                            |
+| ------ | --------------------- | -------------------------------------- |
+| GET    | `/departments`        | Department benefits                    |
+| GET    | `/departments/{id}`   | Single department                      |
+| POST   | `/departments`        | Create a department                    |
 
+`GET /departments` accepts an optional `benefit` query parameter to return only
+the departments that offer that benefit:
+
+```bash
+curl "http://127.0.0.1:8000/departments?benefit=Comida"
+```
 
 ## Try it
 
@@ -64,7 +70,7 @@ app/
     utils.py                       # Module helpers (getNextId)
     controllers/departments.py     # HTTP routes, status codes, HTTP errors
     use_cases/                     # One file per use case
-      get_departments.py           # List departments
+      get_departments.py           # List departments (optional benefit filter)
       get_department.py            # Fetch one department
       create_department.py         # Create a department
     repositories/departments.py    # In-memory storage and id generation
