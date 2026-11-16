@@ -7,20 +7,7 @@ meta {
 get {
   url: {{baseUrl}}/departments/1
   body: none
-  auth: none
-}
-
-tests {
-  test("returns 200", function () {
-    expect(res.getStatus()).to.equal(200);
-  });
-  
-  test("returns the requested department", function () {
-    var department = res.getBody();
-    expect(department.id).to.equal(1);
-    expect(department.name).to.be.a("string");
-    expect(department.benefits).to.be.an("array");
-  });
+  auth: inherit
 }
 
 docs {

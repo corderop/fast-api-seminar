@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
+from app.auth.dependencies import get_current_user
 from app.departments.use_cases.create_department import (
     create_department as create_department_use_case,
 )
@@ -10,7 +11,10 @@ from app.departments.use_cases.get_departments import (
     get_departments as get_departments_use_case,
 )
 
-router = APIRouter(prefix="/departments")
+router = APIRouter(
+    prefix="/departments",
+    dependencies=[Depends(get_current_user)],
+)
 
 
 @router.get("", status_code=status.HTTP_200_OK)

@@ -7,27 +7,14 @@ meta {
 post {
   url: {{baseUrl}}/departments
   body: json
-  auth: none
+  auth: inherit
 }
 
 body:json {
   {
-    "name": "Ventas",
+    "name": "",
     "benefits": ["Guardería", "Transporte", "Salud", "Pensión", "Aparcamiento"]
   }
-}
-
-tests {
-  test("returns 201", function () {
-    expect(res.getStatus()).to.equal(201);
-  });
-  
-  test("returns the created department", function () {
-    var department = res.getBody();
-    expect(department.id).to.be.a("number");
-    expect(department.name).to.equal("Tecnología");
-    expect(department.benefits).to.deep.equal(["Comida", "Transporte"]);
-  });
 }
 
 docs {

@@ -6,6 +6,14 @@ headers {
   Accept: application/json
 }
 
+auth {
+  mode: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
 docs {
   # Benefit Management System
 
@@ -16,6 +24,9 @@ docs {
   1. Start the API with `uv run dev`.
   2. Open this folder in Bruno (`Collection` → `Open Collection`).
   3. Select the `Local` environment.
+  4. Run **Auth → Get Token** first. It stores the JWT in the `token`
+     environment variable, which every other request sends as a bearer token.
 
   The in-memory store starts with one department (`Recursos Humanos`).
+  The default credentials are `admin` / `admin`.
 }

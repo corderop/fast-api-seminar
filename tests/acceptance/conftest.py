@@ -33,3 +33,14 @@ def clean_departments(database):
 @pytest.fixture
 def client():
     return TestClient(app)
+
+
+@pytest.fixture
+def auth_headers(client):
+    response = client.post(
+        "/auth/token",
+        json={"username": "admin", "password": "admin"},
+    )
+    assert response.status_code == 200
+
+    return {"Authorization": f"Bearer {response.json()['access_token']}"}
