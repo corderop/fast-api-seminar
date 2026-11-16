@@ -14,7 +14,7 @@ router = APIRouter(prefix="/departments")
 
 
 @router.get("", status_code=status.HTTP_200_OK)
-def get_departments(benefit: str | None) -> list[dict]:
+def get_departments(benefit: str | None = Query(default=None)) -> list[dict]:
     return get_departments_use_case(benefit=benefit)
 
 

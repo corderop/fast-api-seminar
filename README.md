@@ -6,11 +6,32 @@ API for managing benefit plans, enrollments, and claims. A simple FastAPI projec
 
 - Python 3.12+
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- [Docker](https://docs.docker.com/get-docker/) with Compose
 
 ## Setup
 
+Start PostgreSQL and install dependencies:
+
 ```bash
+docker compose up -d db
 uv sync
+uv run db-init
+```
+
+`docker compose up -d db` starts PostgreSQL 17 on `127.0.0.1:5432` and creates
+two databases: `bms` for development and `bms_test` for the acceptance suite.
+`uv run db-init` creates the schema and the default user.
+
+The application connects with `DATABASE_URL`, which defaults to:
+
+```
+postgresql://bms:bms@127.0.0.1:5432/bms
+```
+
+Override it for another database:
+
+```bash
+export DATABASE_URL="postgresql://user:password@host:5432/database"
 ```
 
 ## Run
@@ -56,8 +77,38 @@ uv run test-unit tests/unit/test_create_department.py
 uv run test-unit -k create_department
 ```
 
-Unit tests live in `tests/unit/`; acceptance tests live in `tests/acceptance/`
-and exercise the API through `TestClient`.
+Unit tests live in `tests/unit/` and mock the repositories, so they never touch
+PostgreSQL. Acceptance tests live in `tests/acceptance/` and exercise the API
+through `TestClient` against the `bms_test` database. Start the database first:
+
+```bash
+docker compose up -d db
+uv run test-acceptance
+```
+
+Acceptance tests create rows with the factories in `app/factories/` and reset
+the `bms_test` database between tests. Point them at another database with
+`TEST_DATABASE_URL`.
+
+## Seed data
+
+`uv run seed` populates the database with fake departments and users generated
+by [Faker](https://faker.readthedocs.io/) and persisted through the factories:
+
+```bash
+uv run seed
+uv run seed --departments 50 --users 10
+uv run seed --clear --random-seed 42
+```
+
+| Option           | Default | Description                                      |
+| ---------------- | ------- | ------------------------------------------------ |
+| `--departments`  | `20`    | Number of departments to create                  |
+| `--users`        | `5`     | Number of users to create beyond the default one |
+| `--clear`        | off     | Delete existing rows first                       |
+| `--random-seed`  | unset   | Seed Faker for reproducible output               |
+
+The default user is created when the schema is initialized.
 
 ## Endpoints
 
@@ -75,6 +126,12 @@ curl "http://127.0.0.1:8000/departments?benefit=Comida"
 ```
 
 ## Try it
+
+Optionally seed some departments first:
+
+```bash
+uv run seed
+```
 
 ```bash
 curl http://127.0.0.1:8000/departments
@@ -111,15 +168,30 @@ The CLI must run from the collection root, so `cd` first.
 ```
 app/
   main.py                          # FastAPI app, mounts module routers
-  cli.py                           # dev entry point (uv run dev)
+  cli.py                           # dev, db-init, seed, and test entry points
+  db.py                            # PostgreSQL connections and schema helpers
+  schema.sql                       # Tables and indexes (pure SQL, no ORM)
+  factories/                       # Faker-backed factories for seed data and tests
+    departments.py                 # Department data builder and persistence factory
+    users.py                       # User data builder and persistence factory
+    fake.py                        # Shared Faker instance
+  auth/                            # user persistence
+    config.py                      # Environment-driven settings
+    passwords.py                   # PBKDF2 hashing and salt generation
+    repositories/users.py          # SQL access to the users table
   departments/                     # departments module
-    utils.py                       # Module helpers (getNextId)
     controllers/departments.py     # HTTP routes, status codes, HTTP errors
     use_cases/                     # One file per use case
       get_departments.py           # List departments (optional benefit filter)
       get_department.py            # Fetch one department
       create_department.py         # Create a department
-    repositories/departments.py    # In-memory storage and id generation
+    repositories/departments.py    # SQL access to departments and benefits
+tests/
+  unit/                            # Use case tests with mocked repositories
+  acceptance/                      # API tests against the bms_test database
+docker/
+  postgres/init.sql                # Creates the bms_test database
+compose.yaml                       # PostgreSQL service
 ```
 
 Each module is a package under `app/` split into three layers:
@@ -128,4 +200,14 @@ Each module is a package under `app/` split into three layers:
 - `use_cases` — business rules, independent of HTTP.
 - `repositories` — data access and persistence.
 
-Requests flow `controller → use case → repository`; controllers never touch storage directly.
+Requests flow `controller → use case → repository`; controllers never touch
+storage directly. Repositories use [psycopg](https://www.psycopg.org/psycopg3/)
+and plain SQL, without an ORM:
+
+- `users` stores one row per user with `salt` and `password_hash`.
+- `departments` stores one row per department.
+- `department_benefits` stores ordered benefits, one row per benefit, with a
+  foreign key and `ON DELETE CASCADE`.
+
+Department reads aggregate benefits in order, so the API still returns
+`{"id", "name", "benefits"}`.
