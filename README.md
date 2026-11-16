@@ -160,6 +160,11 @@ curl "http://127.0.0.1:8000/departments?benefit=Comida" \
   -H "Authorization: Bearer $TOKEN"
 ```
 
+`POST /departments` accepts a JSON body with a required `name` and a required
+`benefits` list. `name` and every benefit must be non-blank; surrounding
+whitespace is trimmed. A department accepts a maximum of 5 benefits. Missing or
+malformed fields return `422`, and more than 5 benefits returns `400`.
+
 ## Try it
 
 Optionally seed some departments first:
